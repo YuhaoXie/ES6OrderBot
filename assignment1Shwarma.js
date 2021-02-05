@@ -18,29 +18,73 @@ module.exports = class ShwarmaOrder extends Order{
     }
     handleInput(sInput){
         let aReturn = [];
+        let totalPrice = 0;
+        let sizePrice;   
+        let toppingsPrice;     
+        let LARGE = 11.99;
+        let MEDIUM = 9.99;
+        let SMALL = 6.99;
+        let VEGE = 0.99;
+        let MEAT = 2.99;    
+        let DRINKPRICE = 2.99;    
         switch(this.stateCur){
             case OrderState.WELCOMING:
                 this.stateCur = OrderState.SIZE;
                 aReturn.push("Welcome to Richard's Shawarma.");
-                aReturn.push("What size would you like?");
+                aReturn.push("What size would you like?");                   
                 break;
             case OrderState.SIZE:
                 this.stateCur = OrderState.TOPPINGS
                 this.sSize = sInput;
-                aReturn.push("What toppings would you like?");
-                break;
+                switch(sInput.toLowerCase()){
+                    case "large":
+                        sizePrice = LARGE;                        
+                        break;
+                    case "medium":
+                        sizePrice = MEDIUM;                       
+                        break;
+                    case "small":
+                        sizePrice = SMALL;                        
+                        break;
+                }    
+                totalPrice += sizePrice;                                       
+                aReturn.push("What toppings would you like? You can choose up to three.");                                
+                break;                
             case OrderState.TOPPINGS:
                 this.stateCur = OrderState.DRINKS
                 this.sToppings = sInput;
+                var [Topping1, Topping2, Topping3] = sInput.split(', ');
+                var Toppings = [Topping1, Topping2, Topping3];
+                console.log("totalPrice" + totalPrice);
+                for(var count = 0; count < Toppings.length; count++){
+                    switch(Toppings[count]){
+                        case "pepperoni":
+                        case "mushrooms":
+                        case "onions":
+                            toppingsPrice = VEGE;
+                            break;
+                        case "sausage":
+                        case "beef":
+                        case "ham":
+                            toppingsPrice = MEAT;
+                            break;
+                        case "undefined":
+                            toppingsPrice = 0;
+                            break;
+                    }    
+                    totalPrice += toppingsPrice;                    
+                    console.log("totalPrice"+totalPrice);
+                }   
                 aReturn.push("Would you like drinks with that?");
                 break;
             case OrderState.DRINKS:
                 this.isDone(true);
                 if(sInput.toLowerCase() != "no"){
+                    totalPrice += DRINKPRICE;
                     this.sDrinks = sInput;
                 }
                 aReturn.push("Thank-you for your order of");
-                aReturn.push(`${this.sSize} ${this.sItem} with ${this.sToppings}`);
+                aReturn.push(`${this.sSize} ${this.sItem} with ${this.sToppings}, total price is ${this.totalPrice}.`);
                 if(this.sDrinks){
                     aReturn.push(this.sDrinks);
                 }
